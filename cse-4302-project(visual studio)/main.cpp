@@ -23,6 +23,7 @@ Rectangle sourcerectidle = { 0, 0, 64, 64 };
 Rectangle sourcerect = { 96, 0, 64, 64 };
 Rectangle destrect = { 224, 287, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
+Rectangle enemy_temp = { 350,287,32,32};
 Rectangle collsionrect;
 vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65} };// for building rect
 template <typename T>
@@ -133,9 +134,9 @@ void Follow(Vector2 heroPos) {
 	float dy = heroPos.y - destrect2.y;
 	float distance = sqrt(dx * dx + dy * dy);
 
-	if (distance > 30.0f) {
-		destrect2.x += (dx / distance) * 1.5;
-		destrect2.y += (dy / distance) * 1.5;
+	if (distance > 40.0f) {
+		destrect2.x += (dx / distance) * 1.3;
+		destrect2.y += (dy / distance) * 1.3;
 		/*collisionRect.x = position.x;
 		collisionRect.y = position.y;*/
 	}
@@ -241,8 +242,13 @@ int main()
 			}
 			collsionrect = { destrect.x + 15, destrect.y - 16,32, 32 };
 			ResolvePlayerBuildingCollision(collsionrect, builiding_rect);
-			destrect.x = collsionrect.x - 15;
-			destrect.y = collsionrect.y + 16;
+			enemy_temp.x = destrect2.x;
+			enemy_temp.y = destrect2.y;
+			collsionrect.x -= 15;
+			collsionrect.y += 16;
+			enemyCollision(collsionrect,enemy_temp);
+			destrect.x = collsionrect.x;
+			destrect.y = collsionrect.y;
 			if (IsKeyDown(KEY_M))
 				currentScreen = GameScreen::MainMenu;
 
@@ -300,6 +306,7 @@ int main()
 			Follow({ destrect.x,destrect.y });
 			DrawRectangleLines(destrect.x + 15, destrect.y - 16, 32, 32, RED);
 			DrawRectangleLines(destrect2.x + 15, destrect2.y - 16, 32, 32, RED);
+			//DrawRectangle(destrect2.x, destrect2.y, 128, 128, RED);
 
 			enemy.Update();
 			enemy.Draw(destrect2);
