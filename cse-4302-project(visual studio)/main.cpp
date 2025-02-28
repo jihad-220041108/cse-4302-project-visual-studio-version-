@@ -135,8 +135,8 @@ void Follow(Vector2 heroPos) {
 	float distance = sqrt(dx * dx + dy * dy);
 
 	if (distance > 40.0f) {
-		destrect2.x += (dx / distance) * 1.3;
-		destrect2.y += (dy / distance) * 1.3;
+		destrect2.x += (dx / distance) * 1.5;
+		destrect2.y += (dy / distance) * 1.5;
 		/*collisionRect.x = position.x;
 		collisionRect.y = position.y;*/
 	}
@@ -160,6 +160,13 @@ int main()
 	playersprite walkSpriteS("characters/gamecharacters/walk-s.png", 8, 25.0f, { 0, 0 });
 	playersprite walkSpriteE("characters/gamecharacters/walk.png", 8, 30.0f, { 0, 0 });
 	playersprite walkSpriteW("characters/gamecharacters/walk-west.png", 8, 30.0f, { 0, 0 });
+	playersprite westaxe("characters/gamecharacters/axe-west.png", 10, 30.0f, { 0, 0 });
+	playersprite axe1("characters/gamecharacters/axe1.png", 10, 30.0f, { 0, 0 });
+	playersprite axe2("characters/gamecharacters/axe2.png", 10, 30.0f, { 0, 0 });
+	playersprite axe3("characters/gamecharacters/axe3.png", 10, 30.0f, { 0, 0 });
+	playersprite axe4("characters/gamecharacters/axe4.png", 10, 30.0f, { 0, 0 });
+	playersprite attack("characters/gamecharacters/attack.png", 10, 30.0f, { 0, 0 });
+	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 30.0f, { 0, 0 });
 	//playersprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	Texture  mapTexturelayer2;
@@ -207,6 +214,7 @@ int main()
 		else if (currentScreen == GameScreen::Game)
 		{
 			bool playerMoving = false;
+			bool isclickedright = true;
 			bool playermovingup = false, playermovingdown = false, playermovingleft = false, playermovingright = false;
 			if (IsKeyDown(KEY_W))
 			{
@@ -231,6 +239,7 @@ int main()
 				destrect.x = Clamp(destrect.x, 0.0f, mapWidth);
 				currentIdleSprite = idleSpriteW;
 				currentIdleSprite.Reset();
+				isclickedright = false;
 			}
 			else if (IsKeyDown(KEY_D))
 			{
@@ -270,7 +279,36 @@ int main()
 			DrawTexture(mapTexturelayer2, 0, 0, WHITE);
 			DrawRectangleLines(40, 15, 45, 65, RED);
 			DrawRectangleLines(140, 40, 45, 65, RED);
-			if (playerMoving)
+			if (IsKeyDown(KEY_F))
+			{
+				if (!playerMoving)
+				{
+					if (IsKeyPressed(KEY_A))
+					{
+						attack_left.Update();
+						attack_left.Draw(destrect);
+					}
+					else
+					{
+						attack.Update();
+						attack.Draw(destrect);
+					}
+				}
+				else 
+				{
+					if (playermovingleft)
+					{
+						attack_left.Update();
+						attack_left.Draw(destrect);
+					}
+					else
+					{
+						attack.Update();
+						attack.Draw(destrect);
+					}
+				}
+			}
+			else if (playerMoving)
 			{
 				if (playermovingup)
 				{
