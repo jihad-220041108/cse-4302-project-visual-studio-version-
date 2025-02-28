@@ -28,7 +28,7 @@ Rectangle enemy_temp = { 350,287,32,32};
 Rectangle healthbar = { 793,35, 18, 18};
 Rectangle healthbar2 = { 480,490, 18, 18 };
 Rectangle collsionrect;
-vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65} };// for building rect
+vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65},{265,45,45,60},{580, 190, 80, 60},{600, 134, 60, 60} };// for building rect
 template <typename T>
 T Clamp(T value, T min, T max) {
 	if (value < min) return min;
@@ -287,12 +287,22 @@ int main()
 				currentIdleSprite.Reset();
 			}
 			collsionrect = { destrect.x + 15, destrect.y - 16,32, 32 };
+
+
+			//collision with buildings and trees
 			ResolvePlayerBuildingCollision(collsionrect, builiding_rect);
+
+
 			enemy_temp.x = destrect2.x;
 			enemy_temp.y = destrect2.y;
 			collsionrect.x -= 15;
 			collsionrect.y += 16;
-			enemyCollision(collsionrect,enemy_temp);
+
+			//checking collision with the enemy----------------------------------------------------
+			//enemyCollision(collsionrect,enemy_temp);
+
+
+
 			destrect.x = collsionrect.x;
 			destrect.y = collsionrect.y;
 			if (IsKeyDown(KEY_M))
@@ -333,8 +343,20 @@ int main()
 			{
 				healthbar2flag = false;
 			}
+
+			//rectangle lines for buildings
 			DrawRectangleLines(40, 15, 45, 65, RED);
 			DrawRectangleLines(140, 40, 45, 65, RED);
+			DrawRectangleLines(265, 45, 45, 60, RED);
+			DrawRectangleLines(580, 190, 80, 60, RED);
+			DrawRectangleLines(600, 134, 60, 60, RED);
+
+
+
+
+
+
+
 			if (IsKeyDown(KEY_F))
 			{
 				int player_difference = destrect.x - destrect2.x;
