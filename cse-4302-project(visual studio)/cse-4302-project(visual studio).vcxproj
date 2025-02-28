@@ -159,6 +159,7 @@
     <ClCompile Include="charactersprite.cpp" />
     <ClCompile Include="chimneysmoke.cpp" />
     <ClCompile Include="enemysprite.cpp" />
+    <ClCompile Include="health.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainmenuspirit.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="charactersprite.h" />
     <ClInclude Include="chimneysmoke.h" />
     <ClInclude Include="enemysprite.h" />
+    <ClInclude Include="health.h" />
     <ClInclude Include="mainmenuspirit.h" />
     <ClInclude Include="sound.h" />
   </ItemGroup>

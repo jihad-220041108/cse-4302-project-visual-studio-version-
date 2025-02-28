@@ -24,6 +24,9 @@ Rectangle sourcerect = { 96, 0, 64, 64 };
 Rectangle destrect = { 224, 287, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
 Rectangle enemy_temp = { 350,287,32,32};
+// health bar for player----------------------------> make a class if possible auvro 
+Rectangle healthbar = { 793,35, 18, 18};
+Rectangle healthbar2 = { 480,490, 18, 18 };
 Rectangle collsionrect;
 vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65} };// for building rect
 template <typename T>
@@ -139,7 +142,7 @@ void Follow(Vector2 heroPos) {
 
 	// Define the attack range
 	const float attackRange = 40.0f;
-	const float followRange = 200.0f;  // Maximum distance to follow player
+	const float followRange = 500.0f;  // Maximum distance to follow player
 
 	if (distance <= attackRange) {
 		// Enemy is close enough to attack
@@ -152,8 +155,8 @@ void Follow(Vector2 heroPos) {
 	else if (distance <= followRange) {
 		// Enemy is following but not close enough to attack
 		isEnemyAttacking = false;
-		destrect2.x += (dx / distance) * 1.5;
-		destrect2.y += (dy / distance) * 1.5;
+		destrect2.x += (dx / distance) * 3;
+		destrect2.y += (dy / distance) * 3;
 	}
 	else {
 		// Enemy is too far to follow or attack
@@ -196,6 +199,15 @@ int main()
 	chimneysmoke smoke2("characters/map/smoke2.png", 30, 10, 30, 25, 1.0, { 845, 300 });
 	chimneysmoke smoke3("characters/map/smoke3.png", 30, 18, 21, 25, 1.0, { 1125, 320 });
 	chimneysmoke smoke4("characters/map/smoke4.png", 30, 20, 32, 25, 1.0, { 1185, 110 });
+	//healthbar -----------------------------------------------------------------
+	Image carrot = LoadImage("characters/gamecharacters/health.png");
+	Texture2D health = LoadTextureFromImage(carrot);
+
+	        
+
+
+
+
 	mapTexturelayer2 = LoadTexture("characters/map/game.png");
 
 	SpriteAnimation menuBackground("images/new2.png", 38, 38.0f, { 0, 1 });
@@ -211,6 +223,9 @@ int main()
 	const float mapHeight = 512.0f;
 	const float player_widht = destrect.width;
 	const float player_height = destrect.height;
+	// health bar for health
+	bool healthbar1flag = true;
+	bool healthbar2flag = true;
 	while (!WindowShouldClose() && exit == false)
 	{
 		BeginDrawing();
@@ -299,6 +314,25 @@ int main()
 
 			BeginMode2D(gamecamera);
 			DrawTexture(mapTexturelayer2, 0, 0, WHITE);
+
+
+			// ---------------------------------------> health bar for player
+			if (!CheckCollisionRecs(collsionrect, healthbar) and healthbar1flag)
+			{
+				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, healthbar, { 0, 0 }, 0.0f, WHITE);
+			}
+			else
+			{
+				healthbar1flag = false;
+			}
+			if (!CheckCollisionRecs(collsionrect, healthbar2) and healthbar2flag)
+			{
+				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, healthbar2, { 0, 0 }, 0.0f, WHITE);
+			}
+			else
+			{
+				healthbar2flag = false;
+			}
 			DrawRectangleLines(40, 15, 45, 65, RED);
 			DrawRectangleLines(140, 40, 45, 65, RED);
 			if (IsKeyDown(KEY_F))
