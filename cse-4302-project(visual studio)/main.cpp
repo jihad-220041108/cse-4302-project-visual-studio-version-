@@ -188,6 +188,7 @@ int main()
 	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 30.0f, { 0, 0 });
 	//playersprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
+	enemysprite enemyleft("characters/gamecharacters/enemywalking_left.png", 8, 30.0f, { 0,0 });
 	enemysprite enemyattack("characters/gamecharacters/enemyattack.png", 8, 30.0f, { 0,0 });
 	enemysprite enemyattack_left("characters/gamecharacters/enemyattack_left.png", 8, 30.0f, { 0,0 });
 	Texture  mapTexturelayer2;
@@ -302,7 +303,18 @@ int main()
 			DrawRectangleLines(140, 40, 45, 65, RED);
 			if (IsKeyDown(KEY_F))
 			{
-				if (!playerMoving)
+				int player_difference = destrect.x - destrect2.x;
+				if (player_difference > 0)
+				{
+					attack_left.Update();
+					attack_left.Draw(destrect);
+				}
+				else
+				{
+					attack.Update();
+					attack.Draw(destrect);
+				}
+				/*if (!playerMoving)
 				{
 					if (IsKeyPressed(KEY_A))
 					{
@@ -327,7 +339,7 @@ int main()
 						attack.Update();
 						attack.Draw(destrect);
 					}
-				}
+				}*/
 			}
 			else if (playerMoving)
 			{
@@ -385,8 +397,17 @@ int main()
 			}
 			else
 			{
-				enemy.Update();
-				enemy.Draw(destrect2);
+				int difference = destrect2.x - destrect.x;
+				if (difference > 0)
+				{
+					enemyleft.Update();
+					enemyleft.Draw(destrect2);
+				}
+				else
+				{
+					enemy.Update();
+					enemy.Draw(destrect2);
+				}	
 			}
 			smoke1.Update();
 			smoke1.Draw();
