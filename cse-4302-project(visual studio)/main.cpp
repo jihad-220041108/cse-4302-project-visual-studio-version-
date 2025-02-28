@@ -129,16 +129,35 @@ void enemyCollision(Rectangle& destrect, Rectangle building)
 bool CanMove(Rectangle newPos, Rectangle enemy) {
 	return !CheckCollisionRecs(newPos, enemy); // Returns true if no collision, false otherwise
 }
+bool isEnemyAttacking = false;
+
+// Modify your Follow function to include attack logic
 void Follow(Vector2 heroPos) {
 	float dx = heroPos.x - destrect2.x;
 	float dy = heroPos.y - destrect2.y;
 	float distance = sqrt(dx * dx + dy * dy);
 
-	if (distance > 40.0f) {
+	// Define the attack range
+	const float attackRange = 40.0f;
+	const float followRange = 200.0f;  // Maximum distance to follow player
+
+	if (distance <= attackRange) {
+		// Enemy is close enough to attack
+		isEnemyAttacking = true;
+		// You might want to stop movement while attacking
+		// Or slow it down slightly
+		//destrect2.x += (dx / distance) * 0.5;  // Slower movement during attack
+		//destrect2.y += (dy / distance) * 0.5;
+	}
+	else if (distance <= followRange) {
+		// Enemy is following but not close enough to attack
+		isEnemyAttacking = false;
 		destrect2.x += (dx / distance) * 1.5;
 		destrect2.y += (dy / distance) * 1.5;
-		/*collisionRect.x = position.x;
-		collisionRect.y = position.y;*/
+	}
+	else {
+		// Enemy is too far to follow or attack
+		isEnemyAttacking = false;
 	}
 }
 int main()
@@ -169,6 +188,8 @@ int main()
 	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 30.0f, { 0, 0 });
 	//playersprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
+	enemysprite enemyattack("characters/gamecharacters/enemyattack.png", 8, 30.0f, { 0,0 });
+	enemysprite enemyattack_left("characters/gamecharacters/enemyattack_left.png", 8, 30.0f, { 0,0 });
 	Texture  mapTexturelayer2;
 	chimneysmoke smoke1("characters/map/smoke1.png", 30, 15, 37, 25, 1.0, { 775, 177 });
 	chimneysmoke smoke2("characters/map/smoke2.png", 30, 10, 30, 25, 1.0, { 845, 300 });
@@ -346,8 +367,27 @@ int main()
 			DrawRectangleLines(destrect2.x + 15, destrect2.y - 16, 32, 32, RED);
 			//DrawRectangle(destrect2.x, destrect2.y, 128, 128, RED);
 
-			enemy.Update();
-			enemy.Draw(destrect2);
+			if (isEnemyAttacking)
+			{
+				int difference = destrect2.x - destrect.x;
+				if(difference > 0)
+				{
+					enemyattack_left.Update();
+					enemyattack_left.Draw(destrect2);
+					
+				}
+				else
+				{
+					enemyattack.Update();
+					enemyattack.Draw(destrect2);
+				}
+				
+			}
+			else
+			{
+				enemy.Update();
+				enemy.Draw(destrect2);
+			}
 			smoke1.Update();
 			smoke1.Draw();
 			smoke2.Update();
