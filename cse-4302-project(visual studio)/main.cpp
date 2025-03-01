@@ -22,13 +22,27 @@ int playerframe = 0;
 Rectangle sourcerectidle = { 0, 0, 64, 64 };
 Rectangle sourcerect = { 96, 0, 64, 64 };
 Rectangle destrect = { 224, 287, 128, 128 };
+Rectangle fishing = { 290, 428, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
 Rectangle enemy_temp = { 350,287,32,32};
 // health bar for player----------------------------> make a class if possible auvro 
-Rectangle healthbar = { 793,35, 18, 18};
-Rectangle healthbar2 = { 480,490, 18, 18 };
+Rectangle healthbar = { 793,35, 20, 20};
+Rectangle healthbar2 = { 480,490, 20, 20};
+
+// treasure__________________________________________
+vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
+
+
+//treasure carry recs
+
+Rectangle carry1_res = { 500, 299, 128, 128 };
+
+
+
+
+
 Rectangle collsionrect;
-vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65},{265,45,45,60},{580, 190, 80, 60},{600, 134, 60, 60} };// for building rect
+vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65},{265,45,45,60},{580, 190, 80, 60},{600, 134, 60, 60},{1210, 400, 200, 150} };// for building rect
 template <typename T>
 T Clamp(T value, T min, T max) {
 	if (value < min) return min;
@@ -199,12 +213,27 @@ int main()
 	chimneysmoke smoke2("characters/map/smoke2.png", 30, 10, 30, 25, 1.0, { 845, 300 });
 	chimneysmoke smoke3("characters/map/smoke3.png", 30, 18, 21, 25, 1.0, { 1125, 320 });
 	chimneysmoke smoke4("characters/map/smoke4.png", 30, 20, 32, 25, 1.0, { 1185, 110 });
+
+
+	// carry sprites for the treasure
+	playersprite carry1("characters/gamecharacters/carry-1.png",8, 30.0f, { 0, 0 });
+	playersprite carry2("characters/gamecharacters/carry-2.png", 8, 30.0f, { 0, 0 });
+	playersprite carry3("characters/gamecharacters/carry-3.png", 8, 30.0f, { 0, 0 });
+
+
+	playersprite fishing_left("characters/gamecharacters/casting-left.png", 17, 10.0f, { 0, 0 });
+
+
+
+
 	//healthbar -----------------------------------------------------------------
 	Image carrot = LoadImage("characters/gamecharacters/health.png");
 	Texture2D health = LoadTextureFromImage(carrot);
 
 	        
-
+	// treasure ..............................................................................
+	Image treasure = LoadImage("characters/gamecharacters/treasure.png");
+	Texture2D treasureTexture = LoadTextureFromImage(treasure);
 
 
 
@@ -223,9 +252,18 @@ int main()
 	const float mapHeight = 512.0f;
 	const float player_widht = destrect.width;
 	const float player_height = destrect.height;
+
+
 	// health bar for health
 	bool healthbar1flag = true;
 	bool healthbar2flag = true;
+
+
+
+	// health bar for treasure
+	vector<bool>treasureflag(7,true);
+
+	// Main game loop
 	while (!WindowShouldClose() && exit == false)
 	{
 		BeginDrawing();
@@ -343,6 +381,20 @@ int main()
 			{
 				healthbar2flag = false;
 			}
+			/// ------------------------------------------->  for treasure
+
+
+			for (auto& treasure_recs : treasures)
+			{
+				if (!CheckCollisionRecs(collsionrect, treasure_recs) and treasureflag[&treasure_recs - &treasures[0]])
+				{
+					DrawTexturePro(treasureTexture, { 0.0f, 0.0f, (float)treasureTexture.width, (float)treasureTexture.height }, treasure_recs, { 0, 0 }, 0.0f, WHITE);
+				}
+				else
+				{
+					treasureflag[&treasure_recs - &treasures[0]] = false;
+				}
+			}
 
 			//rectangle lines for buildings
 			DrawRectangleLines(40, 15, 45, 65, RED);
@@ -350,6 +402,7 @@ int main()
 			DrawRectangleLines(265, 45, 45, 60, RED);
 			DrawRectangleLines(580, 190, 80, 60, RED);
 			DrawRectangleLines(600, 134, 60, 60, RED);
+			DrawRectangleLines(1210, 400, 200, 150, RED);
 
 
 
@@ -465,6 +518,21 @@ int main()
 					enemy.Draw(destrect2);
 				}	
 			}
+
+
+			fishing_left.Update();
+			fishing_left.Draw(fishing);
+
+			// carry treasure
+			carry1.Update();
+			carry1.Draw(carry1_res);
+			carry2.Update();
+			carry2.Draw(carry1_res);
+			carry3.Update();
+			carry3.Draw(carry1_res);
+
+
+
 			smoke1.Update();
 			smoke1.Draw();
 			smoke2.Update();
