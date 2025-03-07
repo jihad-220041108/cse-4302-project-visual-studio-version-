@@ -1,4 +1,4 @@
-#include "mainmenuspirit.h"
+#include "mainmenusprite.h"
 SpriteAnimation::SpriteAnimation(const char* imagePath, int totalFrames, float fps, Vector2 pos)
 {
     spriteSheet = LoadTexture(imagePath);

@@ -1,6 +1,6 @@
 #include <raylib.h>
 #include <bits/stdc++.h>
-#include "mainmenuspirit.h"
+#include "mainmenusprite.h"
 #include "button.h"
 #include "sound.h"
 #include "charactersprite.h"
@@ -180,6 +180,11 @@ void Follow(Vector2 heroPos) {
 		isEnemyAttacking = false;
 	}
 }
+
+
+/// Main Function
+
+
 int main()
 {
 
@@ -191,29 +196,25 @@ int main()
 	InitWindow(windowWidth, windowHeight, "OOP Sprite Animation");
 	ToggleFullscreen();
 
-	playersprite idleSpriteS("characters/gamecharacters/idle-S.png", 4, 20.0f, { 0, 0 });
-	playersprite idleSpriteE("characters/gamecharacters/idle-se.png", 4, 20.0f, { 0, 0 });
+	playersprite idleSpriteS("characters/gamecharacters/idle-S.png", 4, 10.0f, { 0, 0 });
+	playersprite idleSpriteE("characters/gamecharacters/idle-se.png", 4, 10.0f, { 0, 0 });
 	playersprite idleSpriteW("characters/gamecharacters/idle-west.png", 8, 20.0f, { 0, 0 });
-	playersprite idleSpriteN("characters/gamecharacters/idle-n.png", 4, 20.0f, { 0, 0 });
+	playersprite idleSpriteN("characters/gamecharacters/idle-n.png", 4, 10.0f, { 0, 0 });
 	playersprite walkSpriteN("characters/gamecharacters/walk-n.png", 8, 30.0f, { 0, 0 });
 	playersprite walkSpriteS("characters/gamecharacters/walk-s.png", 8, 25.0f, { 0, 0 });
 	playersprite walkSpriteE("characters/gamecharacters/walk.png", 8, 30.0f, { 0, 0 });
 	playersprite walkSpriteW("characters/gamecharacters/walk-west.png", 8, 30.0f, { 0, 0 });
 	playersprite westaxe("characters/gamecharacters/axe-west.png", 10, 30.0f, { 0, 0 });
-	playersprite axe1("characters/gamecharacters/axe1.png", 10, 30.0f, { 0, 0 });
-	playersprite axe2("characters/gamecharacters/axe2.png", 10, 30.0f, { 0, 0 });
-	playersprite axe3("characters/gamecharacters/axe3.png", 10, 30.0f, { 0, 0 });
-	playersprite axe4("characters/gamecharacters/axe4.png", 10, 30.0f, { 0, 0 });
-	playersprite attack("characters/gamecharacters/attack.png", 10, 30.0f, { 0, 0 });
-	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 30.0f, { 0, 0 });
+	playersprite attack("characters/gamecharacters/attack.png", 10, 25.0f, { 0, 0 });
+	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 25.0f, { 0, 0 });
 	//playersprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
 	enemysprite enemyleft("characters/gamecharacters/enemywalking_left.png", 8, 30.0f, { 0,0 });
-	enemysprite enemyattack("characters/gamecharacters/enemyattack.png", 8, 30.0f, { 0,0 });
-	enemysprite enemyattack_left("characters/gamecharacters/enemyattack_left.png", 8, 30.0f, { 0,0 });
+	enemysprite enemyattack("characters/gamecharacters/enemyattack.png", 8, 17.0f, { 0,0 });
+	enemysprite enemyattack_left("characters/gamecharacters/enemyattack_left.png", 8, 17.0f, { 0,0 });
 	Texture  mapTexturelayer2;
-	chimneysmoke smoke1("characters/map/smoke1.png", 30, 15, 37, 25, 1.0, { 775, 177 });
-	chimneysmoke smoke2("characters/map/smoke2.png", 30, 10, 30, 25, 1.0, { 845, 300 });
+	chimneysmoke smoke1("characters/map/smoke1.png", 30, 15, 37, 25, 1.5, { 775, 156 });
+	chimneysmoke smoke2("characters/map/smoke2.png", 30, 10, 30, 25, 1.5, { 843, 280 });
 	chimneysmoke smoke3("characters/map/smoke3.png", 30, 18, 21, 25, 1.0, { 1125, 320 });
 	chimneysmoke smoke4("characters/map/smoke4.png", 30, 20, 32, 25, 1.0, { 1185, 110 });
 
@@ -244,9 +245,8 @@ int main()
 
 	SpriteAnimation menuBackground("images/new2.png", 38, 38.0f, { 0, 1 });
 	InitAudioDevice();
-	Button startButton{ "buttons/start.png", {0, 500}, 0.65 };
-	Button exitButton{ "buttons/exit.png", {0, 650}, 0.65 };
-	sound click("sounds/button.mp3");
+	Button startButton{ "buttons/start.png", {100, 480}, 0.85 };
+	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
 	SetTargetFPS(60);
 	playersprite currentIdleSprite = idleSpriteS;
 
@@ -282,12 +282,10 @@ int main()
 			exitButton.Draw();
 			if (startButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
-				click.playSound();
 				currentScreen = GameScreen::Game;
 			}
 			if (exitButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
-				click.playSound();
 				exit = true;
 			}
 		}
@@ -342,7 +340,7 @@ int main()
 			collsionrect.y += 16;
 
 			//checking collision with the enemy----------------------------------------------------
-			//enemyCollision(collsionrect,enemy_temp);
+			enemyCollision(collsionrect,enemy_temp);
 
 
 
@@ -355,7 +353,7 @@ int main()
 			gamecamera.target = { destrect.x + destrect.width / 2, destrect.y + destrect.height / 2 };
 			gamecamera.offset = { static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2) };
 			gamecamera.rotation = 0.0f;
-			gamecamera.zoom = 3.0f;
+			gamecamera.zoom = 2.2f;
 
 			// Calculate camera bounds to restrict movement
 			float halfScreenWidth = (GetScreenWidth() / 2) / gamecamera.zoom;
@@ -566,11 +564,10 @@ int main()
 			// carry treasure
 
 
-
-			smoke1.Update();
 			smoke1.Draw();
-			smoke2.Update();
+			smoke1.Update();
 			smoke2.Draw();
+			smoke2.Update();
 			smoke3.Update();
 			smoke3.Draw();
 			smoke4.Update();
@@ -578,6 +575,10 @@ int main()
 			cout << "X: " << destrect.x << " Y: " << destrect.y << endl;
 			EndMode2D();
 		}
+		/*else if (currentScreen == GameScreen::GameOver)
+		{
+			DrawText("Game Over", 400, 200, 40, RED);
+		}*/
 
 		EndDrawing();
 	}

@@ -21,7 +21,7 @@
     <ClCompile Include="charactersprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mainmenuspirit.cpp">
+    <ClCompile Include="mainmenusprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sound.cpp">
@@ -44,7 +44,7 @@
     <ClInclude Include="charactersprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mainmenuspirit.h">
+    <ClInclude Include="mainmenusprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sound.h">

@@ -1,5 +1,7 @@
 #pragma once
 #include "raylib.h"
+#include "sound.h"
+
 class Button {
 public:
     Button(const char* imagePath, Vector2 imagePosition, float scale);
@@ -8,7 +10,7 @@ public:
     bool isPressed(Vector2 mousePos, bool mousePressed);
     bool isMouseOver(Vector2 mousePos);
     bool playSound = true;
-    Sound swipe;
+    sound swipe, click;
     void stopSound();
 private:
     Texture2D texture;

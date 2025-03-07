@@ -13,8 +13,9 @@ Button::Button(const char* imagePath, Vector2 imagePosition, float scale)
     texture = LoadTextureFromImage(image);
     UnloadImage(image);
     position = imagePosition;
-    swipe = LoadSound("sounds/button_swipe.mp3");
-    SetSoundVolume(swipe, 3.0f);
+    swipe.setSound("sounds/button_swipe.mp3", 3.0f);
+	click.setSound("sounds/button.mp3", 3.0f);
+    //SetSoundVolume(swipe, 3.0f);
 }
 
 Button::~Button()
@@ -32,7 +33,14 @@ void Button::Draw()
 bool Button::isPressed(Vector2 mousePos, bool mousePressed)
 {
     Rectangle buttonRect = { position.x, position.y, static_cast<float>(texture.width), static_cast<float>(texture.height) };
-    return CheckCollisionPointRec(mousePos, buttonRect) && mousePressed;
+    bool x =  CheckCollisionPointRec(mousePos, buttonRect) && mousePressed;
+	if (x)
+	{
+		click.playSound();
+        return true;
+	}
+
+    return false;
 }
 
 bool Button::isMouseOver(Vector2 mousePos)
@@ -43,7 +51,7 @@ bool Button::isMouseOver(Vector2 mousePos)
         if (playSound)
         {
             playSound = false;
-            PlaySound(swipe);
+            swipe.playSound();
         }
     }
     else
@@ -52,9 +60,4 @@ bool Button::isMouseOver(Vector2 mousePos)
     }
 
     return CheckCollisionPointRec(mousePos, buttonRect);
-}
-
-void Button::stopSound()
-{
-    StopSound(swipe);
 }
