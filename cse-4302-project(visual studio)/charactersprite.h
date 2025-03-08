@@ -16,6 +16,9 @@ public:
     charactersprite(const char* imagePath, int totalFrames, float fps, Vector2 pos);
     virtual void Update();
     virtual void Draw(Rectangle destRect);  // Draw with the specified destination rectangle
+    virtual void assignTexture(string dir, float totalFrame, float fps);
     void Reset();  // Reset animation to the start
+	void destroy();
+
     virtual ~charactersprite();
 };

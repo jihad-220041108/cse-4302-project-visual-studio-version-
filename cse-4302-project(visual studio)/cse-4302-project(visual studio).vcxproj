@@ -163,6 +163,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainmenusprite.cpp" />
     <ClCompile Include="playersprite.cpp" />
+    <ClCompile Include="scoremanager.cpp" />
     <ClCompile Include="sound.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +174,7 @@
     <ClInclude Include="health.h" />
     <ClInclude Include="mainmenusprite.h" />
     <ClInclude Include="playersprite.h" />
+    <ClInclude Include="scoremanager.h" />
     <ClInclude Include="sound.h" />
   </ItemGroup>
   <ItemGroup>

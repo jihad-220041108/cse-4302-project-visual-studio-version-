@@ -21,10 +21,18 @@ void charactersprite::Draw(Rectangle destRect) {
     DrawTexturePro(spriteSheet, sourceRect, destRect, origin, 0.0f, WHITE);
 }
 
+void charactersprite::assignTexture(string dir, float totalFrame, float fps) {
+    /*spriteSheet = tempSprite;*/
+}
+
 void charactersprite::Reset() {
     currentFrame = 0;
     elapsedTime = 0.0f;
     sourceRect.x = 0.0f;
+}
+
+void charactersprite::destroy() {
+    UnloadTexture(spriteSheet);
 }
 
 charactersprite::~charactersprite() {

@@ -6,6 +6,7 @@
 #include "playersprite.h"
 #include "chimneysmoke.h"
 #include "enemysprite.h"
+#include "scoremanager.h"
 using namespace std;
 
 enum class GameScreen
@@ -19,8 +20,6 @@ float playerSpeed = 3.0f;
 Camera2D gamecamera;
 int framcount = 0;
 int playerframe = 0;
-//Rectangle sourcerectidle = { 0, 0, 64, 64 };
-//Rectangle sourcerect = { 96, 0, 64, 64 };
 Rectangle destrect = { 224, 287, 128, 128 };
 Rectangle fishing = { 290, 428, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
@@ -33,11 +32,11 @@ Rectangle carrot2 = { 480,490, 20, 20 };
 
 // treasure__________________________________________
 vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
-
+//vector<Rectangle>treasures = { { 246, 131, 32, 32 } };
 
 //treasure carry recs
 
-Rectangle carry1_res = { 500, 299, 128, 128 };
+//Rectangle carry1_res = { 500, 299, 128, 128 };
 
 
 
@@ -108,10 +107,6 @@ void ResolvePlayerBuildingCollision(Rectangle& destrect, const vector<Rectangle>
 		}
 	}
 }
-
-
-
-
 
 void enemyCollision(Rectangle& destrect, Rectangle building)
 {
@@ -191,6 +186,36 @@ void Follow(Vector2 heroPos) {
 	}
 }
 
+// healthbars
+// Health Bar Dimensions
+const float maxHealth = 100.0f;
+float playerHealth = maxHealth;
+float enemyHealth = maxHealth;
+
+// Function to draw the health bar
+void DrawHealthBar(Rectangle position, float health, float maxHealth) {
+	float healthBarWidth = (health / maxHealth) * (position.width - 30);
+	DrawRectangle(position.x, position.y - 35, healthBarWidth, position.height - 120, RED);
+	DrawRectangleLines(position.x, position.y - 35, position.width - 30, position.height - 120, DARKGRAY);
+}
+
+// Function to save the score to file
+void SaveScore(float timeSpent) {
+	ScoreManager::LoadScoresFromFile();
+	ScoreManager::AddScore(timeSpent);
+	ScoreManager::SaveScoresToFile();
+}
+
+// Check if all treasures are collected
+bool allTreasuresCollected(vector<bool> treasureflag) {
+	for (bool collected : treasureflag) {
+		if (collected == true) {
+			return false;
+		}
+	}
+	return true;
+}
+
 
 /// Main Function
 
@@ -206,31 +231,8 @@ int main()
 	InitWindow(windowWidth, windowHeight, "OOP Sprite Animation");
 	ToggleFullscreen();
 
-	// all of the following fetch player sprite from the folder
-	playersprite idleSpriteS("characters/gamecharacters/idle-S.png", 4, 10.0f, { 0, 0 });
-	playersprite idleSpriteE("characters/gamecharacters/idle-se.png", 4, 10.0f, { 0, 0 });
-	playersprite idleSpriteW("characters/gamecharacters/idle-west.png", 8, 20.0f, { 0, 0 });
-	playersprite idleSpriteN("characters/gamecharacters/idle-n.png", 4, 10.0f, { 0, 0 });
-	playersprite walkSpriteN("characters/gamecharacters/walk-n.png", 8, 30.0f, { 0, 0 });
-	playersprite walkSpriteS("characters/gamecharacters/walk-s.png", 8, 25.0f, { 0, 0 });
-	playersprite walkSpriteE("characters/gamecharacters/walk.png", 8, 30.0f, { 0, 0 });
-	playersprite walkSpriteW("characters/gamecharacters/walk-west.png", 8, 30.0f, { 0, 0 });
-	playersprite westaxe("characters/gamecharacters/axe-west.png", 10, 30.0f, { 0, 0 });
-	playersprite attack("characters/gamecharacters/attack.png", 10, 25.0f, { 0, 0 });
-	playersprite attack_left("characters/gamecharacters/attack-left.png", 10, 25.0f, { 0, 0 });
-	// carry sprites for the treasure
-	playersprite carry1("characters/gamecharacters/carry-1.png", 8, 30.0f, { 0, 0 });
-	playersprite carry2("characters/gamecharacters/carry-2.png", 8, 30.0f, { 0, 0 });
-	playersprite carry3("characters/gamecharacters/carry-3.png", 8, 30.0f, { 0, 0 });
-	playersprite carry_west("characters/gamecharacters/carry-west.png", 8, 30.0f, { 0, 0 });
-	// end of player sprite
-
-	// all of the following fetch enemy sprite from the folder
-	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 30.0f, { 0,0 });
-	enemysprite enemyleft("characters/gamecharacters/enemywalking_left.png", 8, 30.0f, { 0,0 });
-	enemysprite enemyattack("characters/gamecharacters/enemyattack.png", 8, 17.0f, { 0,0 });
-	enemysprite enemyattack_left("characters/gamecharacters/enemyattack_left.png", 8, 17.0f, { 0,0 });
-	// end of enemy sprite
+	playersprite player("characters/gamecharacters/idle-S.png", 10, 10.0f, { 0, 0 });
+	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 20.0f, { 0, 0 });
 
 	// Other sprites
 	Texture  mapTexturelayer2;
@@ -255,7 +257,7 @@ int main()
 	Button startButton{ "buttons/start.png", {100, 480}, 0.85 };
 	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
 	SetTargetFPS(60);
-	playersprite currentIdleSprite = idleSpriteS;
+	//playersprite currentIdleSprite = idleSpriteS;
 
 	// Define map boundaries based on the map dimensions
 	const float mapWidth = 1408.0f;
@@ -265,15 +267,15 @@ int main()
 
 
 	// health bar for health
-	bool healthbar1flag = true;
-	bool healthbar2flag = true;
+	bool carrot1flag = true;
+	bool carrot2flag = true;
 
 	//bool is carring the treasure
 
 	bool carryingtreasure = false;
 
 	// health bar for treasure
-	vector<bool>treasureflag(7,true);
+	vector<bool>treasureflag(7, true);
 
 	// Main game loop
 	while (!WindowShouldClose() && exit == false)
@@ -306,24 +308,24 @@ int main()
 				playerMoving = playermovingup = true;
 				destrect.y -= playerSpeed;
 				destrect.y = Clamp(destrect.y, 0.0f, mapHeight);
-				currentIdleSprite = idleSpriteN;
-				currentIdleSprite.Reset();
+				player.assignTexture("north", 4, 10.0f);
+				//currentIdleSprite.Reset();
 			}
 			else if (IsKeyDown(KEY_DOWN))
 			{
 				playerMoving = playermovingdown = true;
 				destrect.y += playerSpeed;
-				currentIdleSprite = idleSpriteS;
+				player.assignTexture("south", 4, 10.0f);
 				destrect.y = Clamp(destrect.y, 0.0f, mapHeight);
-				currentIdleSprite.Reset();
+				//currentIdleSprite.Reset();
 			}
 			else if (IsKeyDown(KEY_LEFT))
 			{
 				playerMoving = playermovingleft = true;
 				destrect.x -= playerSpeed;
 				destrect.x = Clamp(destrect.x, 0.0f, mapWidth);
-				currentIdleSprite = idleSpriteW;
-				currentIdleSprite.Reset();
+				player.assignTexture("west", 4, 10.0f);
+				//currentIdleSprite.Reset();
 				isclickedright = false;
 			}
 			else if (IsKeyDown(KEY_RIGHT))
@@ -331,8 +333,28 @@ int main()
 				playerMoving = playermovingright = true;
 				destrect.x += playerSpeed;
 				destrect.x = Clamp(destrect.x, 0.0f, mapWidth - 32);
-				currentIdleSprite = idleSpriteE;
-				currentIdleSprite.Reset();
+				player.assignTexture("east", 4, 10.0f);
+				//currentIdleSprite.Reset();
+			}
+
+			float deltaTime = GetFrameTime();
+			playerHealth -= isEnemyAttacking ? 10 * deltaTime : 0; // Example damage from enemy
+			enemyHealth -= IsKeyDown(KEY_F) ? 10 * deltaTime : 0; // Example damage to enemy on attack
+
+			//Check for Game Over (if player's health reaches zero)
+			if (playerHealth <= 0) {
+				SaveScore(deltaTime + 10);
+				currentScreen = GameScreen::MainMenu;
+				// Call game over logic here
+			}
+			// Winning condition: Check if all treasures are collected and the enemy health is zero
+			if (allTreasuresCollected(treasureflag) && enemyHealth <= 0 && carryingtreasure == false) {
+				SaveScore(deltaTime + 10);
+				currentScreen = GameScreen::MainMenu; // End the game and go back to the main menu
+			}    
+
+			if (enemyHealth <= 0) {
+				enemy.setAlive(false);  // Stop enemy actions when health is 0
 			}
 
 			collsionrect = { destrect.x + 15, destrect.y - 16, 32, 32 };
@@ -344,12 +366,6 @@ int main()
 			enemy_temp.y = destrect2.y;
 			collsionrect.x -= 15;
 			collsionrect.y += 16;
-
-			//checking collision with the enemy----------------------------------------------------
-			enemyCollision(collsionrect,enemy_temp);
-			ResolvePlayerBuildingCollision(enemy_temp, builiding_rect);
-			destrect.x = collsionrect.x;
-			destrect.y = collsionrect.y;
 
 			if (IsKeyDown(KEY_M))
 				currentScreen = GameScreen::MainMenu;
@@ -373,21 +389,21 @@ int main()
 
 			
 			// ---------------------------------------> health bar for player
-			if (!CheckCollisionRecs(collsionrect, carrot) and healthbar1flag)
+			if (!CheckCollisionRecs(collsionrect, carrot) and carrot1flag)
 			{
 				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, carrot, { 0, 0 }, 0.0f, WHITE);
 			}
 			else
 			{
-				healthbar1flag = false;
+				carrot1flag = false;
 			}
-			if (!CheckCollisionRecs(collsionrect, carrot2) and healthbar2flag)
+			if (!CheckCollisionRecs(collsionrect, carrot2) and carrot2flag)
 			{
 				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, carrot2, { 0, 0 }, 0.0f, WHITE);
 			}
 			else
 			{
-				healthbar2flag = false;
+				carrot2flag = false;
 			}
 			/// ------------------------------------------->  for treasure
 
@@ -413,12 +429,15 @@ int main()
 			}
 
 
-
 			//rectangle lines for buildings
 			for (auto building : builiding_rect)
 			{
 				DrawRectangleLines(building.x, building.y, building.width, building.height, RED);
 			}
+
+			// Draw Health Bars
+			DrawHealthBar(destrect, playerHealth, maxHealth); // Player health bar
+			if (enemy.getAlive()) DrawHealthBar(destrect2, enemyHealth, maxHealth); // Enemy health bar
 
 
 			if (CheckCollisionRecs(collsionrect, statue))
@@ -431,114 +450,95 @@ int main()
 				int player_difference = destrect.x - destrect2.x;
 				if (player_difference > 0)
 				{
-					attack_left.Update();
-					attack_left.Draw(destrect);
+					player.assignTexture("attack", 10, 25.0f);
 				}
 				else
 				{
-					attack.Update();
-					attack.Draw(destrect);
+					player.assignTexture("attackLeft", 10, 25.0f);
 				}
 			}
 			else if (carryingtreasure)
 			{
+				carryingtreasure = true;
+
 				if (playerMoving)
 				{
 					if (playermovingleft)
 					{
-						carry_west.Update();
-						carry_west.Draw(destrect);
+						player.assignTexture("carryWest", 8, 30.0f);
 					}
 					else
 					{
-						carry1.Update();
-						carry1.Draw(destrect);
-						carry2.Update();
-						carry2.Draw(destrect);
-						carry3.Update();
-						carry3.Draw(destrect);
+						player.assignTexture("carryEast", 8, 30.0f);
 					}
-				}
-				else
-				{
-					currentIdleSprite.Update();
-					currentIdleSprite.Draw(destrect);
 				}
 			}
 			else if (playerMoving)
 			{
 				if (playermovingup)
 				{
-
-					walkSpriteN.Update();
-					walkSpriteN.Draw(destrect);
+					player.assignTexture("walkNorth", 8, 30.0f);
 				}
 				else if (playermovingright)
 				{
-
-					walkSpriteE.Update();
-					walkSpriteE.Draw(destrect);
+					player.assignTexture("walkEast", 8, 30.0f);
 				}
 				else if (playermovingleft)
 				{
-
-					walkSpriteW.Update();
-					walkSpriteW.Draw(destrect);
+					player.assignTexture("walkWest", 8, 30.0f);
 				}
 				else
 				{
-
-					walkSpriteS.Update();
-					walkSpriteS.Draw(destrect);
+					player.assignTexture("walkSouth", 8, 30.0f);
 				}
 			}
-			else
-			{
-
-				currentIdleSprite.Update();
-				currentIdleSprite.Draw(destrect);
-			}
-			Follow({ destrect.x,destrect.y });
+			
+			
 			DrawRectangleLines(destrect.x + 15, destrect.y - 16, 32, 32, RED);
-			DrawRectangleLines(destrect2.x + 15, destrect2.y - 16, 32, 32, RED);
-			//DrawRectangle(destrect2.x, destrect2.y, 128, 128, RED);
 
-			if (isEnemyAttacking)
-			{
-				int difference = destrect2.x - destrect.x;
-				if(difference > 0)
+			if (enemy.getAlive()) {
+				//checking collision with the enemy----------------------------------------------------
+				enemyCollision(collsionrect, enemy_temp);
+				ResolvePlayerBuildingCollision(enemy_temp, builiding_rect);
+				destrect.x = collsionrect.x;
+				destrect.y = collsionrect.y;
+
+				DrawRectangleLines(destrect2.x + 15, destrect2.y - 16, 32, 32, RED);
+				Follow({ destrect.x,destrect.y });
+
+				if (isEnemyAttacking)
 				{
-					enemyattack_left.Update();
-					enemyattack_left.Draw(destrect2);
-					
+					int difference = destrect2.x - destrect.x;
+					if (difference > 0)
+					{
+						enemy.assignTexture("attackLeft", 8, 17.0f);
+					}
+					else
+					{
+						enemy.assignTexture("attackRight", 8, 17.0f);
+					}
 				}
 				else
 				{
-					enemyattack.Update();
-					enemyattack.Draw(destrect2);
+					int difference = destrect2.x - destrect.x;
+					if (difference > 0)
+					{
+						enemy.assignTexture("left", 8, 30.0f);
+					}
+					else
+					{
+						enemy.assignTexture("right", 8, 30.0f);
+					}
 				}
-				
-			}
-			else
-			{
-				int difference = destrect2.x - destrect.x;
-				if (difference > 0)
-				{
-					enemyleft.Update();
-					enemyleft.Draw(destrect2);
-				}
-				else
-				{
-					enemy.Update();
-					enemy.Draw(destrect2);
-				}	
+
+				enemy.Update();
+				enemy.Draw(destrect2);
 			}
 
-
+			player.Update();
+			player.Draw(destrect);
 			fishing_left.Update();
 			fishing_left.Draw(fishing);
-
-			// carry treasure
 
 
 			smoke1.Draw();
