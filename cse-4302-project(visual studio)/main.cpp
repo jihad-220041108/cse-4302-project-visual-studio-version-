@@ -19,15 +19,15 @@ float playerSpeed = 3.0f;
 Camera2D gamecamera;
 int framcount = 0;
 int playerframe = 0;
-Rectangle sourcerectidle = { 0, 0, 64, 64 };
-Rectangle sourcerect = { 96, 0, 64, 64 };
+//Rectangle sourcerectidle = { 0, 0, 64, 64 };
+//Rectangle sourcerect = { 96, 0, 64, 64 };
 Rectangle destrect = { 224, 287, 128, 128 };
 Rectangle fishing = { 290, 428, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
 Rectangle enemy_temp = { 350,287,32,32};
 
 
-// health bar for player----------------------------> make a class if possible auvro 
+// health bar for player----------------------------> make a class if possible Jehad 
 Rectangle healthbar = { 793,35, 20, 20};
 Rectangle healthbar2 = { 480,490, 20, 20};
 
@@ -52,12 +52,19 @@ T Clamp(T value, T min, T max) {
 	if (value > max) return max;
 	return value;
 }
+
+bool CanMove(Rectangle newPos, Rectangle enemy) {
+	return !CheckCollisionRecs(newPos, enemy);
+}
+
 // Function to handle collision between player and buildings
 void ResolvePlayerBuildingCollision(Rectangle& destrect, const vector<Rectangle>& buildings)
 {
 	// Loop through all buildings to check for collision
-	for (const auto& building : buildings)
+	for (auto building : buildings)
 	{
+		//DrawRectangleLines(building.x, building.y, building.width, building.height, RED);
+
 		// Calculate the overlap between player and building
 		float overlapX = (destrect.x + destrect.width / 2) - (building.x + building.width / 2);
 		float overlapY = (destrect.y + destrect.height / 2) - (building.y + building.height / 2);
@@ -101,6 +108,11 @@ void ResolvePlayerBuildingCollision(Rectangle& destrect, const vector<Rectangle>
 		}
 	}
 }
+
+
+
+
+
 void enemyCollision(Rectangle& destrect, Rectangle building)
 {
 	// Loop through all buildings to check for collision
@@ -146,9 +158,7 @@ void enemyCollision(Rectangle& destrect, Rectangle building)
 		}
 	}
 }
-bool CanMove(Rectangle newPos, Rectangle enemy) {
-	return !CheckCollisionRecs(newPos, enemy); // Returns true if no collision, false otherwise
-}
+
 bool isEnemyAttacking = false;
 
 // Modify your Follow function to include attack logic
@@ -294,7 +304,7 @@ int main()
 			bool playerMoving = false;
 			bool isclickedright = true;
 			bool playermovingup = false, playermovingdown = false, playermovingleft = false, playermovingright = false;
-			if (IsKeyDown(KEY_W))
+			if (IsKeyDown(KEY_UP))
 			{
 				playerMoving = playermovingup = true;
 				destrect.y -= playerSpeed;
@@ -302,7 +312,7 @@ int main()
 				currentIdleSprite = idleSpriteN;
 				currentIdleSprite.Reset();
 			}
-			else if (IsKeyDown(KEY_S))
+			else if (IsKeyDown(KEY_DOWN))
 			{
 				playerMoving = playermovingdown = true;
 				destrect.y += playerSpeed;
@@ -310,7 +320,7 @@ int main()
 				destrect.y = Clamp(destrect.y, 0.0f, mapHeight);
 				currentIdleSprite.Reset();
 			}
-			else if (IsKeyDown(KEY_A))
+			else if (IsKeyDown(KEY_LEFT))
 			{
 				playerMoving = playermovingleft = true;
 				destrect.x -= playerSpeed;
@@ -319,7 +329,7 @@ int main()
 				currentIdleSprite.Reset();
 				isclickedright = false;
 			}
-			else if (IsKeyDown(KEY_D))
+			else if (IsKeyDown(KEY_RIGHT))
 			{
 				playerMoving = playermovingright = true;
 				destrect.x += playerSpeed;
@@ -327,12 +337,11 @@ int main()
 				currentIdleSprite = idleSpriteE;
 				currentIdleSprite.Reset();
 			}
-			collsionrect = { destrect.x + 15, destrect.y - 16,32, 32 };
 
+			collsionrect = { destrect.x + 15, destrect.y - 16, 32, 32 };
 
 			//collision with buildings and trees
 			ResolvePlayerBuildingCollision(collsionrect, builiding_rect);
-
 
 			enemy_temp.x = destrect2.x;
 			enemy_temp.y = destrect2.y;
@@ -341,11 +350,10 @@ int main()
 
 			//checking collision with the enemy----------------------------------------------------
 			enemyCollision(collsionrect,enemy_temp);
-
-
-
+			ResolvePlayerBuildingCollision(enemy_temp, builiding_rect);
 			destrect.x = collsionrect.x;
 			destrect.y = collsionrect.y;
+
 			if (IsKeyDown(KEY_M))
 				currentScreen = GameScreen::MainMenu;
 
@@ -407,15 +415,13 @@ int main()
 				}
 			}
 
-			//rectangle lines for buildings
-			DrawRectangleLines(40, 15, 45, 65, RED);
-			DrawRectangleLines(140, 40, 45, 65, RED);
-			DrawRectangleLines(265, 45, 45, 60, RED);
-			DrawRectangleLines(580, 190, 80, 60, RED);
-			DrawRectangleLines(600, 134, 60, 60, RED);
-			DrawRectangleLines(1210, 400, 200, 150, RED);
-			DrawRectangleLines(1262,280,200,150,BLUE);
 
+
+			//rectangle lines for buildings
+			for (auto building : builiding_rect)
+			{
+				DrawRectangleLines(building.x, building.y, building.width, building.height, RED);
+			}
 
 
 			if (CheckCollisionRecs(collsionrect, statue))
@@ -423,7 +429,7 @@ int main()
 				carryingtreasure = false;
 			}
 
-			if (IsKeyDown(KEY_F))
+			if (IsKeyDown(KEY_F) && !carryingtreasure)
 			{
 				int player_difference = destrect.x - destrect2.x;
 				if (player_difference > 0)
@@ -436,32 +442,6 @@ int main()
 					attack.Update();
 					attack.Draw(destrect);
 				}
-				/*if (!playerMoving)
-				{
-					if (IsKeyPressed(KEY_A))
-					{
-						attack_left.Update();
-						attack_left.Draw(destrect);
-					}
-					else
-					{
-						attack.Update();
-						attack.Draw(destrect);
-					}
-				}
-				else 
-				{
-					if (playermovingleft)
-					{
-						attack_left.Update();
-						attack_left.Draw(destrect);
-					}
-					else
-					{
-						attack.Update();
-						attack.Draw(destrect);
-					}
-				}*/
 			}
 			else if (carryingtreasure)
 			{

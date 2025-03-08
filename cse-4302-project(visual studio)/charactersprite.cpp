@@ -26,7 +26,6 @@ void playersprite::Draw(Rectangle destRect)
 {
     Vector2 origin = { destRect.width / 2, destRect.height / 2 };
     DrawTexturePro(spriteSheet, sourceRect, destRect, origin, 0.0f, WHITE);
-    
 }
 
 void playersprite::Reset()

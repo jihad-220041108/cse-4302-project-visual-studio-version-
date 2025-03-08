@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <bits/stdc++.h>
 using namespace std;
+
 class playersprite
 {
 public:
