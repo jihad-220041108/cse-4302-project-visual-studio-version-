@@ -39,6 +39,9 @@
     <ClCompile Include="health.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="playersprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="charactersprite.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="health.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="playersprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
