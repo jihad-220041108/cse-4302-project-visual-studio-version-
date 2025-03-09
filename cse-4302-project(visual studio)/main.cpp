@@ -12,6 +12,7 @@ using namespace std;
 enum class GameScreen
 {
 	MainMenu,
+	GetName,
 	HighScore,
 	Game,
 	GameOver
@@ -250,6 +251,8 @@ int main()
 	chimneysmoke smoke4("characters/map/smoke4.png", 30, 20, 32, 25, 1.0, { 1185, 110 });
 	playersprite fishing_left("characters/gamecharacters/casting-left.png", 17, 10.0f, { 0, 0 });
 
+	//FONT
+	Font font = LoadFont("characters/gamecharacters/alagard.ttf");
 
 	//health carrot -----------------------------------------------------------------
 	Image carrotImage = LoadImage("characters/gamecharacters/health.png");
@@ -265,7 +268,7 @@ int main()
 	Button startButton{ "buttons/start.png", {100, 480}, 0.85 };
 	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
 	Button highScoreButton{ "buttons/start.png", {100, 330}, 0.85 };
-	Button backButton{ "buttons/start.png", {900, 550}, 0.85 }; // Back Button
+	Button backButton{ "buttons/start.png", {200, 750}, 0.85 }; // Back Button
 	SetTargetFPS(60);
 	//playersprite currentIdleSprite = idleSpriteS;
 
@@ -290,6 +293,9 @@ int main()
 	// bool for write operation
 	bool writeScores = true;
 
+	// Player name
+	string playerName = "";
+
 	// Main game loop
 	while (!WindowShouldClose() && exit == false)
 	{
@@ -306,7 +312,7 @@ int main()
 
 			if (startButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
-				currentScreen = GameScreen::Game;
+				currentScreen = GameScreen::GetName;
 			}
 			if (exitButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
@@ -316,6 +322,35 @@ int main()
 				currentScreen = GameScreen::HighScore;
 			}
 		}
+		else if (currentScreen == GameScreen::GetName) {
+			DrawText("Enter your name: ", 200, 200, 40, BLACK);
+			DrawText("Press Enter to start the game", 200, 300, 40, BLACK);
+
+			// Ensure playerName is not reset every frame
+			if (IsKeyPressed(KEY_ENTER)) {
+				currentScreen = GameScreen::Game;
+			}
+
+			// Handle backspace
+			if (IsKeyPressed(KEY_BACKSPACE)) {
+				if (!playerName.empty()) {
+					playerName.pop_back();
+				}
+			}
+			else {
+				int key = GetCharPressed();
+				while (key > 0) {
+					if (key >= 32 && key <= 126) { 
+						playerName += (char)key;
+					}
+					key = GetCharPressed(); 
+				}
+			}
+
+			// Draw the player name in the box
+			DrawText(playerName.c_str(), 200, 250, 40, BLACK);
+		}
+
 		else if (currentScreen == GameScreen::Game)
 		{
 			bool isclickedright = true, playerMoving = false;
@@ -357,13 +392,13 @@ int main()
 
 			//Check for Game Over (if player's health reaches zero)
 			if (playerHealth <= 0) {
-				SaveScore(deltaTime + 10, "PlayerName");
+				SaveScore(deltaTime + 10, playerName);
 				currentScreen = GameScreen::MainMenu;
 				// Call game over logic here
 			}
 			// Winning condition: Check if all treasures are collected and the enemy health is zero
 			if (allTreasuresCollected(treasureflag) && enemyHealth <= 0 && carryingtreasure == false) {
-				SaveScore(deltaTime + 10, "PlayerName");
+				SaveScore(deltaTime + 10, playerName);
 				currentScreen = GameScreen::MainMenu; // End the game and go back to the main menu
 			}    
 
@@ -599,12 +634,15 @@ int main()
 			menuBackground.Draw();
 			
 			// Draw Text and highscores
-			DrawText("Highscores:", 200, 100, 20, DARKGRAY);
-			int yOffset = 120;
+			DrawTextEx(font, "Highscores:", {200,100}, 60.0f, 8, WHITE);
+			/*DrawRectangle(180, 180, 500, 5, BLACK);*/
+			float yOffset = 210;
+			int it = 1;
 			writeScores = false;
 			for (auto& score : highScores) {
-				DrawText(TextFormat("%s: %.2f", score.first.c_str(), score.second), 200, yOffset, 20, DARKGRAY);
-				yOffset += 30;
+
+				DrawTextEx(font, TextFormat("%d.  %s: %.3f", it++, score.first.c_str(), score.second), { 200, yOffset }, 60.0f, 8, WHITE);
+				yOffset += 80;
 			}
 			
 			// Draw back button
