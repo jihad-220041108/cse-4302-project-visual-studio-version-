@@ -6,10 +6,10 @@ class ScoreManager {
 public:
     static void LoadScoresFromFile();
     static void SaveScoresToFile();
-    static void AddScore(float score);
-    static vector<float> GetTopScores();
+    static void AddScore(float score, string name);
+    static vector<pair<string, float>> GetScores();
 
 private:
-    static vector<float> scores;
+    static vector<pair<string, float>> scores;
     static const string scoreFileName;
 };

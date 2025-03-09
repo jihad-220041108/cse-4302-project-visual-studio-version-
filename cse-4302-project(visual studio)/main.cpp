@@ -12,6 +12,7 @@ using namespace std;
 enum class GameScreen
 {
 	MainMenu,
+	HighScore,
 	Game,
 	GameOver
 };
@@ -31,13 +32,8 @@ Rectangle carrot = { 793,35, 20, 20};
 Rectangle carrot2 = { 480,490, 20, 20 };
 
 // treasure__________________________________________
-vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
-//vector<Rectangle>treasures = { { 246, 131, 32, 32 } };
-
-//treasure carry recs
-
-//Rectangle carry1_res = { 500, 299, 128, 128 };
-
+//vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
+vector<Rectangle>treasures = { { 246, 131, 32, 32 } };
 
 
 // rectangle for statue
@@ -199,13 +195,6 @@ void DrawHealthBar(Rectangle position, float health, float maxHealth) {
 	DrawRectangleLines(position.x, position.y - 35, position.width - 30, position.height - 120, DARKGRAY);
 }
 
-// Function to save the score to file
-void SaveScore(float timeSpent) {
-	ScoreManager::LoadScoresFromFile();
-	ScoreManager::AddScore(timeSpent);
-	ScoreManager::SaveScoresToFile();
-}
-
 // Check if all treasures are collected
 bool allTreasuresCollected(vector<bool> treasureflag) {
 	for (bool collected : treasureflag) {
@@ -216,9 +205,23 @@ bool allTreasuresCollected(vector<bool> treasureflag) {
 	return true;
 }
 
+// Function to save the score to file
+void SaveScore(float timeSpent, string playerName) {
+	ScoreManager::LoadScoresFromFile();
+	ScoreManager::AddScore(timeSpent, playerName);
+	ScoreManager::SaveScoresToFile();
+}
 
-/// Main Function
+// Update high scores
+vector<pair<string, float>> highScores;
 
+void UpdateHighScores() {
+	highScores.clear();
+	vector<pair<string, float>> scores = ScoreManager::GetScores();
+	for (auto& score : scores) {
+		highScores.push_back(score);
+	}
+}
 
 int main()
 {
@@ -261,6 +264,8 @@ int main()
 	InitAudioDevice();
 	Button startButton{ "buttons/start.png", {100, 480}, 0.85 };
 	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
+	Button highScoreButton{ "buttons/start.png", {100, 330}, 0.85 };
+	Button backButton{ "buttons/start.png", {900, 550}, 0.85 }; // Back Button
 	SetTargetFPS(60);
 	//playersprite currentIdleSprite = idleSpriteS;
 
@@ -271,16 +276,19 @@ int main()
 	const float player_height = destrect.height;
 
 
-	// health bar for health
+	// health carrot for health
 	bool carrot1flag = true;
 	bool carrot2flag = true;
 
 	//bool is carring the treasure
-
 	bool carryingtreasure = false;
+	bool updateFile = true;
 
-	// health bar for treasure
+	// bool for treasure
 	vector<bool>treasureflag(7, true);
+
+	// bool for write operation
+	bool writeScores = true;
 
 	// Main game loop
 	while (!WindowShouldClose() && exit == false)
@@ -294,6 +302,8 @@ int main()
 			menuBackground.Draw();
 			startButton.Draw();
 			exitButton.Draw();
+			highScoreButton.Draw();
+
 			if (startButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
 				currentScreen = GameScreen::Game;
@@ -301,6 +311,9 @@ int main()
 			if (exitButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON)))
 			{
 				exit = true;
+			}
+			if (highScoreButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
+				currentScreen = GameScreen::HighScore;
 			}
 		}
 		else if (currentScreen == GameScreen::Game)
@@ -344,13 +357,13 @@ int main()
 
 			//Check for Game Over (if player's health reaches zero)
 			if (playerHealth <= 0) {
-				SaveScore(deltaTime + 10);
+				SaveScore(deltaTime + 10, "PlayerName");
 				currentScreen = GameScreen::MainMenu;
 				// Call game over logic here
 			}
 			// Winning condition: Check if all treasures are collected and the enemy health is zero
 			if (allTreasuresCollected(treasureflag) && enemyHealth <= 0 && carryingtreasure == false) {
-				SaveScore(deltaTime + 10);
+				SaveScore(deltaTime + 10, "PlayerName");
 				currentScreen = GameScreen::MainMenu; // End the game and go back to the main menu
 			}    
 
@@ -400,7 +413,7 @@ int main()
 			DrawTexture(mapTexturelayer2, 0, 0, WHITE);
 
 			
-			// ---------------------------------------> health bar for player
+			// ---------------------------------------> health Carrot for player
 			if (!CheckCollisionRecs(collsionrect, carrot) and carrot1flag)
 			{
 				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, carrot, { 0, 0 }, 0.0f, WHITE);
@@ -578,6 +591,27 @@ int main()
 			smoke4.Draw();
 			cout << "X: " << destrect.x << " Y: " << destrect.y << endl;
 			EndMode2D();
+		}
+		else if (currentScreen == GameScreen::HighScore)
+		{
+			UpdateHighScores();
+			menuBackground.Update();
+			menuBackground.Draw();
+			
+			// Draw Text and highscores
+			DrawText("Highscores:", 200, 100, 20, DARKGRAY);
+			int yOffset = 120;
+			writeScores = false;
+			for (auto& score : highScores) {
+				DrawText(TextFormat("%s: %.2f", score.first.c_str(), score.second), 200, yOffset, 20, DARKGRAY);
+				yOffset += 30;
+			}
+			
+			// Draw back button
+			backButton.Draw();
+			if (backButton.isPressed(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON))) {
+				currentScreen = GameScreen::MainMenu;
+			}
 		}
 		/*else if (currentScreen == GameScreen::GameOver)
 		{
