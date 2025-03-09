@@ -231,7 +231,12 @@ int main()
 	InitWindow(windowWidth, windowHeight, "OOP Sprite Animation");
 	ToggleFullscreen();
 
+	// Player
 	playersprite player("characters/gamecharacters/idle-S.png", 10, 10.0f, { 0, 0 });
+	string currentIdleSprite = "south";
+
+	// Enemies
+	int defeatedEnemies = 0;
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 20.0f, { 0, 0 });
 
 	// Other sprites
@@ -300,41 +305,37 @@ int main()
 		}
 		else if (currentScreen == GameScreen::Game)
 		{
-			bool playerMoving = false;
-			bool isclickedright = true;
-			bool playermovingup = false, playermovingdown = false, playermovingleft = false, playermovingright = false;
+			bool isclickedright = true, playerMoving = false;
+			bool playermovingup = false, playermovingdown = false;
+			bool playermovingleft = false, playermovingright = false;
+
 			if (IsKeyDown(KEY_UP))
 			{
 				playerMoving = playermovingup = true;
 				destrect.y -= playerSpeed;
 				destrect.y = Clamp(destrect.y, 0.0f, mapHeight);
-				player.assignTexture("north", 4, 10.0f);
-				//currentIdleSprite.Reset();
+				currentIdleSprite = "north";
 			}
 			else if (IsKeyDown(KEY_DOWN))
 			{
 				playerMoving = playermovingdown = true;
 				destrect.y += playerSpeed;
-				player.assignTexture("south", 4, 10.0f);
+				currentIdleSprite = "south";
 				destrect.y = Clamp(destrect.y, 0.0f, mapHeight);
-				//currentIdleSprite.Reset();
 			}
 			else if (IsKeyDown(KEY_LEFT))
 			{
 				playerMoving = playermovingleft = true;
 				destrect.x -= playerSpeed;
 				destrect.x = Clamp(destrect.x, 0.0f, mapWidth);
-				player.assignTexture("west", 4, 10.0f);
-				//currentIdleSprite.Reset();
-				isclickedright = false;
+				currentIdleSprite = "west";
 			}
 			else if (IsKeyDown(KEY_RIGHT))
 			{
 				playerMoving = playermovingright = true;
 				destrect.x += playerSpeed;
 				destrect.x = Clamp(destrect.x, 0.0f, mapWidth - 32);
-				player.assignTexture("east", 4, 10.0f);
-				//currentIdleSprite.Reset();
+				currentIdleSprite = "east";
 			}
 
 			float deltaTime = GetFrameTime();
@@ -354,7 +355,18 @@ int main()
 			}    
 
 			if (enemyHealth <= 0) {
-				enemy.setAlive(false);  // Stop enemy actions when health is 0
+				if(defeatedEnemies >= 5)
+					enemy.setAlive(false);  // Stop enemy actions when health is 0
+				else {
+					enemyHealth = maxHealth;
+					destrect2.x = 560;
+					destrect2.y = 389;
+					defeatedEnemies++;
+					if (defeatedEnemies % 2)
+						enemy.setColor({ 255, 0, 0, 190 });
+					else
+						enemy.setColor(WHITE);
+				}
 			}
 
 			collsionrect = { destrect.x + 15, destrect.y - 16, 32, 32 };
@@ -472,6 +484,12 @@ int main()
 						player.assignTexture("carryEast", 8, 30.0f);
 					}
 				}
+				else {
+					if (currentIdleSprite == "west" || currentIdleSprite == "north")
+						player.assignTexture("carryIdle", 1, 5.0f);
+					else
+						player.assignTexture("carryIdleEast", 1, 5.0f);
+				}
 			}
 			else if (playerMoving)
 			{
@@ -492,7 +510,16 @@ int main()
 					player.assignTexture("walkSouth", 8, 30.0f);
 				}
 			}
-			
+			else {
+				if (currentIdleSprite == "north")
+					player.assignTexture("north", 8, 10.0f);
+				else if (currentIdleSprite == "south")
+					player.assignTexture("south", 8, 10.0f);	
+				else if (currentIdleSprite == "east")		
+					player.assignTexture("east", 8, 10.0f);
+				else if (currentIdleSprite == "west")
+					player.assignTexture("west", 8, 10.0f);
+			}
 			
 			DrawRectangleLines(destrect.x + 15, destrect.y - 16, 32, 32, RED);
 

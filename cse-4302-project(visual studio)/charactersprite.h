@@ -12,11 +12,13 @@ public:
     int currentFrame;        // Current frame being displayed
     float frameTime;         // Time between frames
     float elapsedTime;       // Time accumulator for switching frames
+	Color color = WHITE;     // Tint color for the sprite
 
     charactersprite(const char* imagePath, int totalFrames, float fps, Vector2 pos);
     virtual void Update();
     virtual void Draw(Rectangle destRect);  // Draw with the specified destination rectangle
     virtual void assignTexture(string dir, float totalFrame, float fps);
+	void setColor(Color color);
     void Reset();  // Reset animation to the start
 	void destroy();
 

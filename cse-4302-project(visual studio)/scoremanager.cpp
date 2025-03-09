@@ -15,7 +15,7 @@ void ScoreManager::LoadScoresFromFile() {
 void ScoreManager::SaveScoresToFile() {
     ofstream file(scoreFileName);
     for (const float& score : scores) {
-        file << score << std::endl;
+        file << score << endl;
     }
     file.close();
 }

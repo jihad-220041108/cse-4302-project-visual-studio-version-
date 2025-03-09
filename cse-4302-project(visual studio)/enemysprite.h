@@ -10,6 +10,8 @@ private:
 
     bool isAlive = true;  // Track whether the enemy is alive or not
 
+
+
 public:
     enemysprite(const char* imagePath, int totalFrames, float fps, Vector2 pos)
         : charactersprite(imagePath, totalFrames, fps, pos) {}

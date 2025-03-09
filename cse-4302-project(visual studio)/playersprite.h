@@ -16,6 +16,8 @@ private:
 	Texture2D attackLeft = LoadTexture("characters/gamecharacters/attack-left.png");
 	Texture2D carryEast = LoadTexture("characters/gamecharacters/carry-east.png");
 	Texture2D carryWest = LoadTexture("characters/gamecharacters/carry-west.png");
+	Texture2D carryIdle = LoadTexture("characters/gamecharacters/carry-idle.png");
+	Texture2D carryIdleEast = LoadTexture("characters/gamecharacters/carry-idle-east.png");
 
 public:
     playersprite(const char* imagePath, int totalFrames, float fps, Vector2 pos)
@@ -64,6 +66,12 @@ public:
 		}
 		else if (dir == "carryWest") {
 			spriteSheet = carryWest;
+		}
+		else if (dir == "carryIdle") {
+			spriteSheet = carryIdle;
+		}
+		else if (dir == "carryIdleEast") {
+			spriteSheet = carryIdleEast;
 		}
 	}
 };
