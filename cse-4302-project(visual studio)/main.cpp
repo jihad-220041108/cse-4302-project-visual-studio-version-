@@ -20,21 +20,25 @@ enum class GameScreen
 
 float playerSpeed = 3.0f;
 Camera2D gamecamera;
-int framcount = 0;
+int framecount = 0;
 int playerframe = 0;
+
+// Character destination rectangle
 Rectangle destrect = { 224, 287, 128, 128 };
 Rectangle fishing = { 290, 428, 128, 128 };
 Rectangle destrect2 = { 350,287,128,128 };
 Rectangle enemy_temp = { 350,287,32,32};
 
+// Enemy attack flag
+bool isEnemyAttacking = false;
 
-// health bar for player----------------------------> make a class if possible Jehad / Labib, not Auvro
+// health carrot for player
 Rectangle carrot = { 793,35, 20, 20};
 Rectangle carrot2 = { 480,490, 20, 20 };
 
 // treasure__________________________________________
-//vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
-vector<Rectangle>treasures = { { 246, 131, 32, 32 } };
+vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 1138, 460, 32, 32 } ,{ 924, 139, 32, 32 } ,{ 1223, 281, 32, 32 } ,{ 1224,28, 32, 32 } ,{ 503, 178, 32, 32 } };
+//vector<Rectangle>treasures = { { 246, 131, 32, 32 } };
 
 
 // rectangle for statue
@@ -151,8 +155,6 @@ void enemyCollision(Rectangle& destrect, Rectangle building)
 	}
 }
 
-bool isEnemyAttacking = false;
-
 // Modify your Follow function to include attack logic
 void Follow(Vector2 heroPos) {
 	float dx = heroPos.x - destrect2.x;
@@ -183,7 +185,6 @@ void Follow(Vector2 heroPos) {
 	}
 }
 
-// healthbars
 // Health Bar Dimensions
 const float maxHealth = 100.0f;
 float playerHealth = maxHealth;
@@ -214,19 +215,58 @@ void SaveScore(float timeSpent, string playerName) {
 }
 
 // Update high scores
-vector<pair<string, float>> highScores;
+vector<pair<float, string>> highScores;
 
 void UpdateHighScores() {
 	highScores.clear();
-	vector<pair<string, float>> scores = ScoreManager::GetScores();
+	vector<pair<float, string>> scores = ScoreManager::GetScores();
 	for (auto& score : scores) {
 		highScores.push_back(score);
 	}
 }
 
+// Main function related variables
+
+string currentIdleSprite = "south";
+int defeatedEnemies = 0;
+//bool for health carrot
+bool carrot1flag = true;
+bool carrot2flag = true;
+//bool is carring the treasure
+bool carryingtreasure = false;
+// bool for treasure
+vector<bool>treasureflag(7, true);
+int treasuresCollected = 0;
+// Player name
+string playerName = "";
+// Time measurement
+float timeSpent = 0.0;
+float startTime = 0.0;
+
+void resetGame() {
+	playerHealth = maxHealth;
+	enemyHealth = maxHealth;
+	playerName = "";
+	currentIdleSprite = "south";
+	defeatedEnemies = 0;
+	treasuresCollected = 0;
+	carrot1flag = true;
+	carrot2flag = true;
+	carryingtreasure = false;
+	treasureflag = { true };
+	destrect = { 224, 287, 128, 128 };
+	destrect2 = { 350,287,128,128 };
+	enemy_temp = { 350,287,32,32 };
+	carrot = { 793,35, 20, 20 };
+	carrot2 = { 480,490, 20, 20 };
+	isEnemyAttacking = false;
+	highScores.clear();
+	timeSpent = 0.0f;
+	startTime = 0.0f;
+}
+
 int main()
 {
-
 	GameScreen currentScreen = GameScreen::MainMenu;
 	bool exit = false;
 	const int windowWidth = GetScreenWidth();
@@ -234,13 +274,11 @@ int main()
 
 	InitWindow(windowWidth, windowHeight, "OOP Sprite Animation");
 	ToggleFullscreen();
+	startTime = GetTime();
 
 	// Player
 	playersprite player("characters/gamecharacters/idle-S.png", 10, 10.0f, { 0, 0 });
-	string currentIdleSprite = "south";
-
 	// Enemies
-	int defeatedEnemies = 0;
 	enemysprite enemy("characters/gamecharacters/enemywalking.png", 8, 20.0f, { 0, 0 });
 
 	// Other sprites
@@ -256,7 +294,7 @@ int main()
 
 	//health carrot -----------------------------------------------------------------
 	Image carrotImage = LoadImage("characters/gamecharacters/health.png");
-	Texture2D health = LoadTextureFromImage(carrotImage);
+	Texture2D Carrot = LoadTextureFromImage(carrotImage);
 	        
 	// treasure ..............................................................................
 	Image treasure = LoadImage("characters/gamecharacters/treasure.png");
@@ -265,42 +303,24 @@ int main()
 	mapTexturelayer2 = LoadTexture("characters/map/game.png");
 	SpriteAnimation menuBackground("images/new2.png", 38, 38.0f, { 0, 1 });
 	InitAudioDevice();
-	Button startButton{ "buttons/start.png", {100, 480}, 0.85 };
+	Button startButton{ "buttons/start.png", {100, 330}, 0.85 };
 	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
-	Button highScoreButton{ "buttons/start.png", {100, 330}, 0.85 };
-	Button backButton{ "buttons/start.png", {200, 750}, 0.85 }; // Back Button
+	Button highScoreButton{ "buttons/highScore.png", {90, 480}, 0.85 };
+	Button backButton{ "buttons/back.png", {200, 750}, 0.85 }; // Back Button
 	SetTargetFPS(60);
-	//playersprite currentIdleSprite = idleSpriteS;
 
 	// Define map boundaries based on the map dimensions
 	const float mapWidth = 1408.0f;
 	const float mapHeight = 512.0f;
 	const float player_widht = destrect.width;
 	const float player_height = destrect.height;
-
-
-	// health carrot for health
-	bool carrot1flag = true;
-	bool carrot2flag = true;
-
-	//bool is carring the treasure
-	bool carryingtreasure = false;
-	bool updateFile = true;
-
-	// bool for treasure
-	vector<bool>treasureflag(1, true);
-
-	// bool for write operation
-	bool writeScores = true;
-
-	// Player name
-	string playerName = "";
-
+	
 	// Main game loop
 	while (!WindowShouldClose() && exit == false)
 	{
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
+		timeSpent = GetTime() - startTime;
 
 		if (currentScreen == GameScreen::MainMenu)
 		{
@@ -393,32 +413,43 @@ int main()
 			playerHealth -= isEnemyAttacking ? 10 * deltaTime : 0; // Example damage from enemy
 			enemyHealth -= IsKeyDown(KEY_F) ? 10 * deltaTime : 0; // Example damage to enemy on attack
 
-			//Check for Game Over (if player's health reaches zero)
-			if (playerHealth <= 0) {
-				SaveScore(deltaTime + 10, playerName);
-				currentScreen = GameScreen::MainMenu;
-				// Call game over logic here
-			}
-			// Winning condition: Check if all treasures are collected and the enemy health is zero
-			if (allTreasuresCollected(treasureflag) && enemyHealth <= 0 && carryingtreasure == false) {
-				SaveScore(deltaTime + 10, playerName);
-				currentScreen = GameScreen::MainMenu; // End the game and go back to the main menu
-			}    
+			if (enemyHealth <= 0 && enemy.getAlive()) {
+				defeatedEnemies++;
 
-			if (enemyHealth <= 0) {
-				if(defeatedEnemies >= 2)
+				if (defeatedEnemies >= 5)
 					enemy.setAlive(false);  // Stop enemy actions when health is 0
 				else {
 					enemyHealth = maxHealth;
 					destrect2.x = 560;
 					destrect2.y = 389;
-					defeatedEnemies++;
+	
 					if (defeatedEnemies % 2)
 						enemy.setColor({ 255, 0, 0, 190 });
 					else
 						enemy.setColor(WHITE);
 				}
 			}
+
+			//Check for Game Over (if player's health reaches zero)
+			if (playerHealth <= 0) {
+				float score = (treasuresCollected * 15) + (defeatedEnemies * 20) - ((float)timeSpent/10);
+				score = max(score, 0.0f);
+				SaveScore(score, playerName);
+				resetGame();
+				enemy.setAlive(true);
+				startTime = GetTime();
+				currentScreen = GameScreen::MainMenu;
+			}
+			// Winning condition: Check if all treasures are collected and the enemy health is zero
+			if (allTreasuresCollected(treasureflag) && !enemy.getAlive() && carryingtreasure == false) {
+				float score = (treasuresCollected * 15) + (defeatedEnemies * 20) - ((float)timeSpent/10);
+				score = max(score, 0.0f);
+				SaveScore(score, playerName);
+				resetGame();
+				enemy.setAlive(true);	
+				startTime = GetTime();
+				currentScreen = GameScreen::MainMenu; 
+			}    
 
 			collsionrect = { destrect.x + 15, destrect.y - 16, 32, 32 };
 
@@ -454,18 +485,22 @@ int main()
 			// ---------------------------------------> health Carrot for player
 			if (!CheckCollisionRecs(collsionrect, carrot) and carrot1flag)
 			{
-				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, carrot, { 0, 0 }, 0.0f, WHITE);
+				DrawTexturePro(Carrot, { 0.0f, 0.0f, (float)Carrot.width, (float)Carrot.height }, carrot, { 0, 0 }, 0.0f, WHITE);
 			}
 			else
 			{
+				if (carrot1flag)
+					playerHealth = min(playerHealth + maxHealth / 2, maxHealth);
 				carrot1flag = false;
 			}
 			if (!CheckCollisionRecs(collsionrect, carrot2) and carrot2flag)
 			{
-				DrawTexturePro(health, { 0.0f, 0.0f, (float)health.width, (float)health.height }, carrot2, { 0, 0 }, 0.0f, WHITE);
+				DrawTexturePro(Carrot, { 0.0f, 0.0f, (float)Carrot.width, (float)Carrot.height }, carrot2, { 0, 0 }, 0.0f, WHITE);
 			}
 			else
 			{
+				if (carrot2flag)
+					playerHealth = min(playerHealth + maxHealth / 2, maxHealth);
 				carrot2flag = false;
 			}
 			/// ------------------------------------------->  for treasure
@@ -481,11 +516,11 @@ int main()
 
 				else if (treasureflag[&treasure_recs - &treasures[0]] && !carryingtreasure)
 				{
-					
+					treasuresCollected++;
 					treasureflag[&treasure_recs - &treasures[0]] = false;
 					carryingtreasure = !treasureflag[&treasure_recs - &treasures[0]];
 				}
-				else if (carryingtreasure and CheckCollisionRecs(collsionrect,treasure_recs) and treasureflag[&treasure_recs - &treasures[0]])
+				else if (carryingtreasure and CheckCollisionRecs(collsionrect, treasure_recs) and treasureflag[&treasure_recs - &treasures[0]])
 				{
 					DrawTexturePro(treasureTexture, { 0.0f, 0.0f, (float)treasureTexture.width, (float)treasureTexture.height }, treasure_recs, { 0, 0 }, 0.0f, WHITE);
 				}
@@ -633,18 +668,18 @@ int main()
 		else if (currentScreen == GameScreen::HighScore)
 		{
 			UpdateHighScores();
-			menuBackground.Update();
-			menuBackground.Draw();
+			/*menuBackground.Update();
+			menuBackground.Draw();*/
 			
 			// Draw Text and highscores
-			DrawTextEx(font, "Highscores:", {200,100}, 60.0f, 8, WHITE);
+			DrawTextEx(font, "Highscores:", {200,100}, 60.0f, 8, BLACK);
 			/*DrawRectangle(180, 180, 500, 5, BLACK);*/
 			float yOffset = 210;
 			int it = 1;
-			writeScores = false;
+			
 			for (auto& score : highScores) {
 
-				DrawTextEx(font, TextFormat("%d.  %s: %.3f", it++, score.first.c_str(), score.second), { 200, yOffset }, 60.0f, 8, WHITE);
+				DrawTextEx(font, TextFormat("%d.  %s: %.3f", it++, score.second.c_str(), score.first), { 200, yOffset }, 60.0f, 8, BLACK);
 				yOffset += 80;
 			}
 			

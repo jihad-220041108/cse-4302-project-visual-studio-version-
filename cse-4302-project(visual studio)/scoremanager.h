@@ -7,9 +7,9 @@ public:
     static void LoadScoresFromFile();
     static void SaveScoresToFile();
     static void AddScore(float score, string name);
-    static vector<pair<string, float>> GetScores();
+    static vector<pair<float, string>> GetScores();
 
 private:
-    static vector<pair<string, float>> scores;
+    static vector<pair<float, string>> scores;
     static const string scoreFileName;
 };
