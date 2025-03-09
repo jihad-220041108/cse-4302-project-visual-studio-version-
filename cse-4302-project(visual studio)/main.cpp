@@ -288,7 +288,7 @@ int main()
 	bool updateFile = true;
 
 	// bool for treasure
-	vector<bool>treasureflag(7, true);
+	vector<bool>treasureflag(1, true);
 
 	// bool for write operation
 	bool writeScores = true;
@@ -323,32 +323,35 @@ int main()
 			}
 		}
 		else if (currentScreen == GameScreen::GetName) {
-			DrawText("Enter your name: ", 200, 200, 40, BLACK);
-			DrawText("Press Enter to start the game", 200, 300, 40, BLACK);
+			/*menuBackground.Update();
+			menuBackground.Draw();*/
+			DrawText("Enter your name!", 710, 400, 50, BLACK);
 
-			// Ensure playerName is not reset every frame
-			if (IsKeyPressed(KEY_ENTER)) {
+			if (IsKeyPressed(KEY_ENTER) && playerName.size() >= 4) {
 				currentScreen = GameScreen::Game;
 			}
 
-			// Handle backspace
 			if (IsKeyPressed(KEY_BACKSPACE)) {
 				if (!playerName.empty()) {
 					playerName.pop_back();
 				}
 			}
-			else {
+			else if(playerName.size() <= 12){
 				int key = GetCharPressed();
-				while (key > 0) {
-					if (key >= 32 && key <= 126) { 
-						playerName += (char)key;
-					}
-					key = GetCharPressed(); 
+				if ((key >= 65 && key <= 90) || (key >= 97 && key <= 122)) {
+					playerName.push_back((char)key);
 				}
+				key = GetCharPressed(); 
 			}
 
 			// Draw the player name in the box
-			DrawText(playerName.c_str(), 200, 250, 40, BLACK);
+			Rectangle textBox = { 650, 480, 540, 60 };
+			DrawRectangleRec(textBox, LIGHTGRAY);
+			if (playerName.size()) {
+				DrawRectangleLines(textBox.x, textBox.y, textBox.width, textBox.height, BLUE);
+			}
+			DrawText(playerName.c_str(), textBox.x + 270 - 16*playerName.size(), textBox.y + 5, 50, BLACK);
+			DrawText("Press Enter to start the game", 540, 600, 50, BLACK);
 		}
 
 		else if (currentScreen == GameScreen::Game)
@@ -403,7 +406,7 @@ int main()
 			}    
 
 			if (enemyHealth <= 0) {
-				if(defeatedEnemies >= 5)
+				if(defeatedEnemies >= 2)
 					enemy.setAlive(false);  // Stop enemy actions when health is 0
 				else {
 					enemyHealth = maxHealth;
