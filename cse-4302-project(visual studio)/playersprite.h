@@ -21,7 +21,8 @@ private:
 
 public:
     playersprite(const char* imagePath, int totalFrames, float fps, Vector2 pos)
-        : charactersprite(imagePath, totalFrames, fps, pos) {}
+        : charactersprite(imagePath, totalFrames, fps, pos) {
+	}
 
     // Additional player-specific logic can go here
 	void assignTexture(string dir, float totalFrame, float fps) {

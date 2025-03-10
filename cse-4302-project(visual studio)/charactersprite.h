@@ -1,6 +1,7 @@
 #pragma once
 #include <raylib.h>
 #include <bits/stdc++.h>
+#include "sound.h"
 using namespace std;
 
 class charactersprite {
@@ -13,7 +14,7 @@ public:
     float frameTime;         // Time between frames
     float elapsedTime;       // Time accumulator for switching frames
 	Color color = WHITE;     // Tint color for the sprite
-
+	//sound attacksound;       // Sound to play when attacking
     charactersprite(const char* imagePath, int totalFrames, float fps, Vector2 pos);
     virtual void Update();
     virtual void Draw(Rectangle destRect);  // Draw with the specified destination rectangle

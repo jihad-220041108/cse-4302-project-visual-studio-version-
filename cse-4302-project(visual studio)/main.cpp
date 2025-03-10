@@ -46,7 +46,7 @@ vector<Rectangle>treasures= { { 246, 131, 32, 32 } , { 600, 480, 32, 32 } ,{ 113
 Rectangle statue = { 1262,280,200,150 };
 
 Rectangle collsionrect;
-vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65},{265,45,45,60},{580, 190, 80, 60},{600, 134, 60, 60},{1210, 400, 200, 150}};// for building rect
+vector<Rectangle> builiding_rect{ {40, 15, 45, 65},{140, 40, 45, 65},{265,45,45,60},{580, 190, 30, 20},{600, 134, 30, 30},{1210, 400, 200, 150},{36,376,377,224} ,{780,216,65,44} ,{1284,342,49,21},{941,285,35,9},{381,262,338,1},{774,351,83,45} ,{1118,362,57,37} ,{1165,122,125,73} ,{906,64,1,173},{1000,83,1,170} };// for building rect
 template <typename T>
 T Clamp(T value, T min, T max) {
 	if (value < min) return min;
@@ -260,7 +260,7 @@ void resetGame() {
 	carrot1flag = true;
 	carrot2flag = true;
 	carryingtreasure = false;
-	treasureflag = { true };
+	treasureflag = { true, true, true, true, true, true, true};
 	destrect = { 224, 287, 128, 128 };
 	destrect2 = { 350,287,128,128 };
 	enemy_temp = { 350,287,32,32 };
