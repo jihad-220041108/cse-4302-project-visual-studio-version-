@@ -31,6 +31,7 @@ Rectangle enemy_temp = { 350,287,32,32};
 
 // Enemy attack flag
 bool isEnemyAttacking = false;
+bool canAttack = false;
 
 // health carrot for player
 Rectangle carrot = { 793,35, 20, 20};
@@ -163,15 +164,21 @@ void Follow(Vector2 heroPos) {
 
 	// Define the attack range
 	const float attackRange = 40.0f;
-	const float followRange = 500.0f;  // Maximum distance to follow player
+	const float playerAttackRange = 70.0f;
+	const float followRange = 1000.0f;  // Maximum distance to follow player
+
+	if (distance <= playerAttackRange)
+	{
+		canAttack = true;
+	}
+	else
+	{
+		canAttack = false;
+	}
 
 	if (distance <= attackRange) {
 		// Enemy is close enough to attack
 		isEnemyAttacking = true;
-		// You might want to stop movement while attacking
-		// Or slow it down slightly
-		//destrect2.x += (dx / distance) * 0.5;  // Slower movement during attack
-		//destrect2.y += (dy / distance) * 0.5;
 	}
 	else if (distance <= followRange) {
 		// Enemy is following but not close enough to attack
@@ -260,6 +267,7 @@ void resetGame() {
 	carrot = { 793,35, 20, 20 };
 	carrot2 = { 480,490, 20, 20 };
 	isEnemyAttacking = false;
+	canAttack = false;
 	highScores.clear();
 	timeSpent = 0.0f;
 	startTime = 0.0f;
@@ -411,7 +419,7 @@ int main()
 
 			float deltaTime = GetFrameTime();
 			playerHealth -= isEnemyAttacking ? 10 * deltaTime : 0; // Example damage from enemy
-			enemyHealth -= IsKeyDown(KEY_F) ? 10 * deltaTime : 0; // Example damage to enemy on attack
+			enemyHealth -= (IsKeyDown(KEY_F) && !carryingtreasure && canAttack) ? 10 * deltaTime : 0; // Example damage to enemy on attack
 
 			if (enemyHealth <= 0 && enemy.getAlive()) {
 				defeatedEnemies++;
@@ -543,7 +551,7 @@ int main()
 				carryingtreasure = false;
 			}
 
-			if (IsKeyDown(KEY_F) && !carryingtreasure)
+			if (IsKeyDown(KEY_F) && !carryingtreasure && canAttack)
 			{
 				int player_difference = destrect.x - destrect2.x;
 				if (player_difference > 0)
