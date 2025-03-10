@@ -315,6 +315,8 @@ int main()
 	Button exitButton{ "buttons/exit.png", {100, 630}, 0.85 };
 	Button highScoreButton{ "buttons/highScore.png", {90, 480}, 0.85 };
 	Button backButton{ "buttons/back.png", {200, 750}, 0.85 }; // Back Button
+	//player attack sound 
+	sound attacksound("sounds/attack.mp3");
 	SetTargetFPS(60);
 
 	// Define map boundaries based on the map dimensions
@@ -420,6 +422,16 @@ int main()
 			float deltaTime = GetFrameTime();
 			playerHealth -= isEnemyAttacking ? 10 * deltaTime : 0; // Example damage from enemy
 			enemyHealth -= (IsKeyDown(KEY_F) && !carryingtreasure && canAttack) ? 10 * deltaTime : 0; // Example damage to enemy on attack
+			
+			
+	
+			
+			if (IsKeyPressed(KEY_F) && !carryingtreasure && canAttack)
+				attacksound.playSound();
+
+
+
+
 
 			if (enemyHealth <= 0 && enemy.getAlive()) {
 				defeatedEnemies++;
